@@ -40,12 +40,12 @@ func TestNewHashTable(t *testing.T) {
 func TestHashTable_Insert(t *testing.T) {
 	type fields struct {
 		size    uint
-		items   []interface{}
+		items   []any
 		indexer Indexer
 	}
 	type args struct {
 		key   int
-		value interface{}
+		value any
 	}
 	tests := []struct {
 		name    string
@@ -55,13 +55,13 @@ func TestHashTable_Insert(t *testing.T) {
 	}{
 		{
 			name:    "empty hashTable",
-			fields:  fields{size: 0, items: make([]interface{}, 0), indexer: NewModuloIndexer(0)},
+			fields:  fields{size: 0, items: make([]any, 0), indexer: NewModuloIndexer(0)},
 			args:    args{key: 11, value: 11},
 			wantErr: true,
 		},
 		{
 			name:    "success insert",
-			fields:  fields{size: 10, items: make([]interface{}, 10), indexer: NewModuloIndexer(10)},
+			fields:  fields{size: 10, items: make([]any, 10), indexer: NewModuloIndexer(10)},
 			args:    args{key: 1, value: 1},
 			wantErr: false,
 		},
@@ -83,32 +83,32 @@ func TestHashTable_Insert(t *testing.T) {
 func TestHashTable_Search(t *testing.T) {
 	type fields struct {
 		size    uint
-		items   []interface{}
+		items   []any
 		indexer Indexer
 	}
 	type args struct {
 		key int
 	}
-	items := make([]interface{}, 10)
+	items := make([]any, 10)
 	items[5] = "success"
 
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
 			name:    "empty hashTable",
-			fields:  fields{size: 0, items: make([]interface{}, 0), indexer: NewModuloIndexer(0)},
+			fields:  fields{size: 0, items: make([]any, 0), indexer: NewModuloIndexer(0)},
 			args:    args{key: 11},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "not found",
-			fields:  fields{size: 10, items: make([]interface{}, 10), indexer: NewModuloIndexer(10)},
+			fields:  fields{size: 10, items: make([]any, 10), indexer: NewModuloIndexer(10)},
 			args:    args{key: 1},
 			want:    nil,
 			wantErr: true,
@@ -143,13 +143,13 @@ func TestHashTable_Search(t *testing.T) {
 func TestHashTable_Delete(t *testing.T) {
 	type fields struct {
 		size    uint
-		items   []interface{}
+		items   []any
 		indexer Indexer
 	}
 	type args struct {
 		key int
 	}
-	items := make([]interface{}, 10)
+	items := make([]any, 10)
 	items[5] = "success"
 
 	tests := []struct {
@@ -160,13 +160,13 @@ func TestHashTable_Delete(t *testing.T) {
 	}{
 		{
 			name:    "empty hashTable",
-			fields:  fields{size: 0, items: make([]interface{}, 0), indexer: NewModuloIndexer(0)},
+			fields:  fields{size: 0, items: make([]any, 0), indexer: NewModuloIndexer(0)},
 			args:    args{key: 11},
 			wantErr: true,
 		},
 		{
 			name:    "not found",
-			fields:  fields{size: 10, items: make([]interface{}, 10), indexer: NewModuloIndexer(10)},
+			fields:  fields{size: 10, items: make([]any, 10), indexer: NewModuloIndexer(10)},
 			args:    args{key: 1},
 			wantErr: true,
 		},
@@ -194,13 +194,13 @@ func TestHashTable_Delete(t *testing.T) {
 func TestHashTable_InsertLinearProbing(t *testing.T) {
 	type fields struct {
 		size          uint
-		items         []interface{}
+		items         []any
 		indexer       Indexer
 		countElements uint
 	}
 	type args struct {
 		key   int
-		value interface{}
+		value any
 	}
 	tests := []struct {
 		name    string
@@ -210,13 +210,13 @@ func TestHashTable_InsertLinearProbing(t *testing.T) {
 	}{
 		{
 			name:    "empty hashTable",
-			fields:  fields{size: 0, items: make([]interface{}, 0), indexer: NewModuloIndexer(0)},
+			fields:  fields{size: 0, items: make([]any, 0), indexer: NewModuloIndexer(0)},
 			args:    args{key: 11, value: 11},
 			wantErr: true,
 		},
 		{
 			name:    "success insert",
-			fields:  fields{size: 10, items: make([]interface{}, 10), indexer: NewModuloIndexer(10)},
+			fields:  fields{size: 10, items: make([]any, 10), indexer: NewModuloIndexer(10)},
 			args:    args{key: 1, value: 1},
 			wantErr: false,
 		},

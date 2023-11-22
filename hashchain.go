@@ -5,7 +5,7 @@ import "errors"
 // node is a structure item of hash table with chain
 type node struct {
 	key   int
-	value interface{}
+	value any
 	next  *node
 }
 
@@ -31,7 +31,7 @@ func NewHashTableChain(size uint, indexer Indexer) *HashTableChain {
 }
 
 // Insert - function for inserting item to hash table
-func (ht *HashTableChain) Insert(key int, value interface{}) error {
+func (ht *HashTableChain) Insert(key int, value any) error {
 	ht.countElements++
 	if ht.countElements > ht.size {
 		if err := ht.rebuild(); err != nil {
@@ -55,7 +55,7 @@ func (ht *HashTableChain) Insert(key int, value interface{}) error {
 }
 
 // Search - function for searching item in hash table by key. Function will return value of item by key
-func (ht *HashTableChain) Search(key int) (interface{}, error) {
+func (ht *HashTableChain) Search(key int) (any, error) {
 	index, err := ht.indexer.Index(key)
 	if err != nil {
 		return nil, err

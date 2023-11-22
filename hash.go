@@ -9,7 +9,7 @@ import "errors"
 // countElements - current count of elements in hash table
 type HashTable struct {
 	size          uint
-	items         []interface{}
+	items         []any
 	indexer       Indexer
 	countElements uint
 }
@@ -18,13 +18,13 @@ type HashTable struct {
 func NewHashTable(s uint, indexer Indexer) *HashTable {
 	return &HashTable{
 		size:    s,
-		items:   make([]interface{}, s),
+		items:   make([]any, s),
 		indexer: indexer,
 	}
 }
 
 // Insert - function for inserting item to hash table
-func (h *HashTable) Insert(key int, value interface{}) error {
+func (h *HashTable) Insert(key int, value any) error {
 	h.countElements++
 	if h.countElements > h.size {
 		if err := h.rebuild(); err != nil {
@@ -43,7 +43,7 @@ func (h *HashTable) Insert(key int, value interface{}) error {
 }
 
 // InsertLinearProbing - function for inserting item to hash table using linear probing
-func (h *HashTable) InsertLinearProbing(key int, value interface{}) error {
+func (h *HashTable) InsertLinearProbing(key int, value any) error {
 	h.countElements++
 	if h.countElements > h.size {
 		if err := h.rebuild(); err != nil {
@@ -76,7 +76,7 @@ func (h *HashTable) InsertLinearProbing(key int, value interface{}) error {
 }
 
 // Search - function for searching item in hash table by key. Function will return value of item by key
-func (h *HashTable) Search(key int) (interface{}, error) {
+func (h *HashTable) Search(key int) (any, error) {
 	index, err := h.indexer.Index(key)
 	if err != nil {
 		return nil, err

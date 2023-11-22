@@ -40,7 +40,7 @@ func TestNewHashTableChain(t *testing.T) {
 func TestHashTableChain_Insert(t *testing.T) {
 	type args struct {
 		key   int
-		value interface{}
+		value any
 	}
 	tests := []struct {
 		name    string
@@ -87,7 +87,7 @@ func TestHashTableChain_Search(t *testing.T) {
 		name    string
 		ht      *HashTableChain
 		key     int
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
