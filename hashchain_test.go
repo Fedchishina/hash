@@ -6,31 +6,23 @@ import (
 )
 
 func TestNewHashTableChain(t *testing.T) {
-	type args struct {
-		size    uint
-		indexer Indexer
-	}
 	tests := []struct {
 		name string
-		args args
-		want *HashTableChain
+		size uint
+		want *HashTableChain[IntKey]
 	}{
 		{
 			name: "success creating",
-			args: args{
-				size:    10,
-				indexer: NewModuloIndexer(10),
-			},
-			want: &HashTableChain{
-				size:    10,
-				items:   make(map[uint]*node, 10),
-				indexer: NewModuloIndexer(10),
+			size: 10,
+			want: &HashTableChain[IntKey]{
+				size:  10,
+				items: make(map[uint]*nodeChain[IntKey], 10),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewHashTableChain(tt.args.size, tt.args.indexer); !reflect.DeepEqual(got, tt.want) {
+			if got := NewHashTableChain[IntKey](tt.size); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewHashTableChain() = %v, want %v", got, tt.want)
 			}
 		})
@@ -39,7 +31,7 @@ func TestNewHashTableChain(t *testing.T) {
 
 func TestHashTableChain_Insert(t *testing.T) {
 	type args struct {
-		key   int
+		key   IntKey
 		value any
 	}
 	tests := []struct {
@@ -55,7 +47,7 @@ func TestHashTableChain_Insert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ht := NewHashTable(10, NewModuloIndexer(10))
+			ht := NewHashTableChain[IntKey](10)
 			if err := ht.Insert(tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("Insert() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -64,7 +56,7 @@ func TestHashTableChain_Insert(t *testing.T) {
 }
 
 func TestHashTableChain_InsertNext(t *testing.T) {
-	ht := NewHashTableChain(10, NewModuloIndexer(10))
+	ht := NewHashTableChain[IntKey](10)
 	ht.Insert(1, 1)
 	first := ht.items[1]
 	checkCondition(first.key == 1, "incorrect keys", t)
@@ -85,37 +77,37 @@ func TestHashTableChain_InsertNext(t *testing.T) {
 func TestHashTableChain_Search(t *testing.T) {
 	tests := []struct {
 		name    string
-		ht      *HashTableChain
-		key     int
+		ht      *HashTableChain[IntKey]
+		key     IntKey
 		want    any
 		wantErr bool
 	}{
 		{
 			name:    "empty hashTable",
-			ht:      getHashTable([]int{}),
+			ht:      getHashTableChain([]IntKey{}),
 			key:     1,
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "not found",
-			ht:      getHashTable([]int{1, 2, 3}),
+			ht:      getHashTableChain([]IntKey{1, 2, 3}),
 			key:     8,
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "found",
-			ht:      getHashTable([]int{1, 2, 3}),
+			ht:      getHashTableChain([]IntKey{1, 2, 3}),
 			key:     1,
-			want:    1,
+			want:    IntKey(1),
 			wantErr: false,
 		},
 		{
 			name:    "found in next",
-			ht:      getHashTable([]int{1, 2, 3, 11}),
+			ht:      getHashTableChain([]IntKey{1, 2, 3, 11}),
 			key:     11,
-			want:    11,
+			want:    IntKey(11),
 			wantErr: false,
 		},
 	}
@@ -125,10 +117,12 @@ func TestHashTableChain_Search(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Search() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			} else {
+				if got != tt.want {
+					t.Errorf("Search() got = %v, want %v", got, tt.want)
+				}
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Search() got = %v, want %v", got, tt.want)
-			}
+
 		})
 	}
 }
@@ -136,26 +130,26 @@ func TestHashTableChain_Search(t *testing.T) {
 func TestHashTableChain_Delete(t *testing.T) {
 	tests := []struct {
 		name    string
-		ht      *HashTableChain
-		key     int
+		ht      *HashTableChain[IntKey]
+		key     IntKey
 		wantErr bool
 	}{
 		{
 			name:    "empty hashTable",
-			ht:      getHashTable([]int{}),
+			ht:      getHashTableChain([]IntKey{}),
 			key:     1,
 			wantErr: true,
 		},
 		{
 			name:    "not found",
-			ht:      getHashTable([]int{1, 2, 3}),
+			ht:      getHashTableChain([]IntKey{1, 2, 3}),
 			key:     8,
 			wantErr: true,
 		},
 		{
 			name:    "found",
-			ht:      getHashTable([]int{1, 2, 3}),
-			key:     1,
+			ht:      getHashTableChain([]IntKey{1, 2, 3}),
+			key:     3,
 			wantErr: false,
 		},
 	}
@@ -170,8 +164,9 @@ func TestHashTableChain_Delete(t *testing.T) {
 }
 
 func TestHashTableChain_DeleteNext(t *testing.T) {
-	ht := NewHashTableChain(10, NewModuloIndexer(10))
+	ht := NewHashTableChain[IntKey](10)
 	ht.Insert(1, 1)
+	ht.Insert(2, 2)
 	ht.Insert(11, 11)
 
 	ht.Delete(1)
@@ -188,8 +183,8 @@ func checkCondition(condition bool, message string, t *testing.T) {
 	}
 }
 
-func getHashTable(items []int) *HashTableChain {
-	ht := NewHashTableChain(10, NewModuloIndexer(10))
+func getHashTableChain(items []IntKey) *HashTableChain[IntKey] {
+	ht := NewHashTableChain[IntKey](10)
 	for _, el := range items {
 		ht.Insert(el, el)
 	}
