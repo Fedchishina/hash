@@ -16,7 +16,7 @@ func TestNewHashTableChain(t *testing.T) {
 			size: 10,
 			want: &HashTableChain[IntKey]{
 				size:  10,
-				items: make(map[uint]*nodeChain[IntKey], 10),
+				items: make([]*nodeChain[IntKey], 10),
 			},
 		},
 	}

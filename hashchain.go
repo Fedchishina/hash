@@ -18,7 +18,7 @@ type nodeChain[T Hashable] struct {
 // countElements - current count of elements in hash table
 type HashTableChain[T Hashable] struct {
 	size          uint
-	items         map[uint]*nodeChain[T]
+	items         []*nodeChain[T]
 	countElements uint
 }
 
@@ -26,7 +26,7 @@ type HashTableChain[T Hashable] struct {
 func NewHashTableChain[T Hashable](size uint) *HashTableChain[T] {
 	return &HashTableChain[T]{
 		size:  size,
-		items: make(map[uint]*nodeChain[T], size),
+		items: make([]*nodeChain[T], size),
 	}
 }
 

@@ -30,31 +30,8 @@ func NewHashTable[T Hashable](s uint) *HashTable[T] {
 	}
 }
 
-// Insert - function for inserting item to hash table
+// Insert - function for inserting item to hash table using linear probing
 func (h *HashTable[T]) Insert(key T, value any) error {
-	h.countElements++
-	if h.countElements > h.size {
-		if err := h.rebuild(); err != nil {
-			return err
-		}
-	}
-
-	index, err := h.index(key)
-	if err != nil {
-		return err
-	}
-
-	n := &node[T]{
-		key:   key,
-		value: value,
-	}
-	h.items[index] = n
-
-	return nil
-}
-
-// InsertLinearProbing - function for inserting item to hash table using linear probing
-func (h *HashTable[T]) InsertLinearProbing(key T, value any) error {
 	h.countElements++
 	if h.countElements > h.size {
 		if err := h.rebuild(); err != nil {

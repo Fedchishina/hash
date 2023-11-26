@@ -167,7 +167,7 @@ func TestHashTable_InsertLinearProbing(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.ht.InsertLinearProbing(tt.key, tt.key); (err != nil) != tt.wantErr {
+			if err := tt.ht.Insert(tt.key, tt.key); (err != nil) != tt.wantErr {
 				t.Errorf("InsertLinearProbing() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -176,10 +176,10 @@ func TestHashTable_InsertLinearProbing(t *testing.T) {
 
 func TestHashTable_InsertLinearProbing_details(t *testing.T) {
 	ht := NewHashTable[IntKey](10)
-	ht.InsertLinearProbing(1, 1)
+	ht.Insert(1, 1)
 	checkCondition(ht.items[1].key == 1, "incorrect keys", t)
 
-	ht.InsertLinearProbing(11, 11)
+	ht.Insert(11, 11)
 	checkCondition(ht.items[2].key == 11, "incorrect keys", t)
 }
 
