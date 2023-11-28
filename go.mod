@@ -1,3 +1,3 @@
-module github.com/fedchishina/hash
+module github.com/fedchishina/hashtable
 
 go 1.21

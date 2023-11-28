@@ -1,4 +1,4 @@
-hash
+hashtable
 =======================
 Library for work with hash tables.
 
