@@ -5,10 +5,10 @@ import (
 )
 
 // node is a structure item of hash table with chain
-type node[T Hashable] struct {
-	key   T
-	value any
-	next  *nodeChain[T]
+type node[K, V Hashable] struct {
+	key   K
+	value V
+	next  *node[K, V]
 }
 
 // HashTable is a structure of hash table
@@ -16,22 +16,22 @@ type node[T Hashable] struct {
 // items - items of hash table
 // indexer - is an indexer which wil be used for getting index by key for hash table
 // countElements - current count of elements in hash table
-type HashTable[T Hashable] struct {
+type HashTable[K, V Hashable] struct {
 	size          uint
-	items         map[uint]*node[T]
+	items         []*node[K, V]
 	countElements uint
 }
 
 // NewHashTable - function for creating empty hash table
-func NewHashTable[T Hashable](s uint) *HashTable[T] {
-	return &HashTable[T]{
+func NewHashTable[K, V Hashable](s uint) *HashTable[K, V] {
+	return &HashTable[K, V]{
 		size:  s,
-		items: make(map[uint]*node[T], s),
+		items: make([]*node[K, V], s),
 	}
 }
 
 // Insert - function for inserting item to hash table using linear probing
-func (h *HashTable[T]) Insert(key T, value any) error {
+func (h *HashTable[K, V]) Insert(key K, value V) error {
 	h.countElements++
 	if h.countElements > h.size {
 		if err := h.rebuild(); err != nil {
@@ -39,7 +39,7 @@ func (h *HashTable[T]) Insert(key T, value any) error {
 		}
 	}
 
-	n := &node[T]{
+	n := &node[K, V]{
 		key:   key,
 		value: value,
 	}
@@ -69,21 +69,22 @@ func (h *HashTable[T]) Insert(key T, value any) error {
 }
 
 // Search - function for searching item in hash table by key. Function will return value of item by key
-func (h *HashTable[T]) Search(key T) (any, error) {
+func (h *HashTable[K, V]) Search(key K) (V, error) {
+	var zeroValue V
 	index, err := h.index(key)
 	if err != nil {
-		return nil, err
+		return zeroValue, err
 	}
 
 	if h.items[index] == nil {
-		return nil, errors.New("item not found")
+		return zeroValue, errors.New("item not found")
 	}
 
 	return h.items[index].value, nil
 }
 
 // Delete - function for Deleting item by key in hash table
-func (h *HashTable[T]) Delete(key T) error {
+func (h *HashTable[K, V]) Delete(key K) error {
 	index, err := h.index(key)
 	if err != nil {
 		return err
@@ -100,8 +101,8 @@ func (h *HashTable[T]) Delete(key T) error {
 }
 
 // rebuild - internal function for rebuilding hash table
-func (h *HashTable[T]) rebuild() error {
-	newTable := NewHashTable[T](h.size * 2)
+func (h *HashTable[K, V]) rebuild() error {
+	newTable := NewHashTable[K, V](h.size * 2)
 
 	for _, item := range h.items {
 		if err := newTable.Insert(item.key, item.value); err != nil {
@@ -116,10 +117,15 @@ func (h *HashTable[T]) rebuild() error {
 }
 
 // Index - get index (by key) where we will insert item to hash table
-func (h *HashTable[T]) index(key T) (uint, error) {
+func (h *HashTable[K, V]) index(key K) (uint, error) {
 	if h.size == 0 {
 		return 0, errors.New("size cannot be zero")
 	}
 
-	return key.Hash() % h.size, nil
+	hash, err := calculateHash(key)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(hash % uint32(h.size)), nil
 }

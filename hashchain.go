@@ -5,10 +5,10 @@ import (
 )
 
 // nodeChain is a structure item of hash table with chain
-type nodeChain[T Hashable] struct {
-	key   T
-	value any
-	next  *nodeChain[T]
+type nodeChain[K, V Hashable] struct {
+	key   K
+	value V
+	next  *nodeChain[K, V]
 }
 
 // HashTableChain - is a structure of hash table
@@ -16,22 +16,22 @@ type nodeChain[T Hashable] struct {
 // items - items of hash table
 // indexer - is an indexer which wil be used for getting index by key for hash table
 // countElements - current count of elements in hash table
-type HashTableChain[T Hashable] struct {
+type HashTableChain[K, V Hashable] struct {
 	size          uint
-	items         []*nodeChain[T]
+	items         []*nodeChain[K, V]
 	countElements uint
 }
 
 // NewHashTableChain - function for creating empty hash table
-func NewHashTableChain[T Hashable](size uint) *HashTableChain[T] {
-	return &HashTableChain[T]{
+func NewHashTableChain[K, V Hashable](size uint) *HashTableChain[K, V] {
+	return &HashTableChain[K, V]{
 		size:  size,
-		items: make([]*nodeChain[T], size),
+		items: make([]*nodeChain[K, V], size),
 	}
 }
 
 // Insert - function for inserting item to hash table
-func (ht *HashTableChain[T]) Insert(key T, value any) error {
+func (ht *HashTableChain[K, V]) Insert(key K, value V) error {
 	ht.countElements++
 	if ht.countElements > ht.size {
 		if err := ht.rebuild(); err != nil {
@@ -44,7 +44,7 @@ func (ht *HashTableChain[T]) Insert(key T, value any) error {
 		return err
 	}
 
-	n := &nodeChain[T]{
+	n := &nodeChain[K, V]{
 		key:   key,
 		value: value,
 		next:  ht.items[index],
@@ -55,10 +55,11 @@ func (ht *HashTableChain[T]) Insert(key T, value any) error {
 }
 
 // Search - function for searching item in hash table by key. Function will return value of item by key
-func (ht *HashTableChain[T]) Search(key T) (any, error) {
+func (ht *HashTableChain[K, V]) Search(key K) (V, error) {
+	var zeroValue V
 	index, err := ht.index(key)
 	if err != nil {
-		return nil, err
+		return zeroValue, err
 	}
 
 	current := ht.items[index]
@@ -69,11 +70,11 @@ func (ht *HashTableChain[T]) Search(key T) (any, error) {
 		current = current.next
 	}
 
-	return nil, errors.New("item not found")
+	return zeroValue, errors.New("item not found")
 }
 
 // Delete - function for Deleting item by key in hash table
-func (ht *HashTableChain[T]) Delete(key T) error {
+func (ht *HashTableChain[K, V]) Delete(key K) error {
 	index, err := ht.index(key)
 	if err != nil {
 		return err
@@ -106,8 +107,8 @@ func (ht *HashTableChain[T]) Delete(key T) error {
 }
 
 // rebuild - internal function for rebuilding hash table
-func (ht *HashTableChain[T]) rebuild() error {
-	newTable := NewHashTableChain[T](ht.size * 2)
+func (ht *HashTableChain[K, V]) rebuild() error {
+	newTable := NewHashTableChain[K, V](ht.size * 2)
 
 	for _, item := range ht.items {
 		current := item
@@ -126,11 +127,16 @@ func (ht *HashTableChain[T]) rebuild() error {
 	return nil
 }
 
-// Index - get index (by key) where we will insert item to hash table
-func (ht *HashTableChain[T]) index(key T) (uint, error) {
+// index - get index (by key) where we will insert item to hash table
+func (ht *HashTableChain[K, V]) index(key K) (uint, error) {
 	if ht.size == 0 {
 		return 0, errors.New("size cannot be zero")
 	}
 
-	return key.Hash() % ht.size, nil
+	hash, err := calculateHash(key)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(hash % uint32(ht.size)), nil
 }

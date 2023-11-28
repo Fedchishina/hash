@@ -12,21 +12,21 @@ You can create a hash table and use a list of functions to work with it.
 
 ### Empty hash table creation example
 ```
-htInt := hash.NewHashTable[hash.IntKey](3) // simple hash table with int keys
-htString := hash.NewHashTable[hash.StringKey](3) // simple hash table with string keys
-htChain := hash.NewHashTableChain[hash.IntKey](3) // create hash table with int keys and chain realisation
+htInt := hash.NewHashTable[int, int](3) // simple hash table with int keys and values
+htString := hash.NewHashTable[string, string](3) // simple hash table with string keys and values
+htChain := hash.NewHashTableChain[int, int](3) // create hash table with int keys and values and chain realisation
 ```
 
 ### Insert key into hash table
 ```
-ht := hash.NewHashTable[hash.IntKey](3) // simple hash table
+ht := hash.NewHashTable[int, int](3) // simple hash table
 ht.Insert(1, "value 1")
 ht.Insert(2, "value 2")
 ```
 
 ### Search element by key
 ```
-ht := hash.NewHashTable[hash.IntKey](3) // simple hash table
+ht := hash.NewHashTable[int, string](3) // simple hash table
 ht.Insert(1, "value 1")
 ht.Insert(2, "value 2")
 
@@ -36,7 +36,7 @@ resultNil, err := ht.Search(3) // return "not found" error
 
 ### Delete element by key
 ```
-ht := hash.NewHashTable[hash.IntKey](3) // simple hash table
+ht := hash.NewHashTable[int, string](3) // simple hash table
 ht.Insert(1, "value 1")
 ht.Insert(2, "value 2")
 
